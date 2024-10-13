@@ -2,7 +2,8 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
 
-from src.database.models.users import Users
+from src.database import Users
+from src.utils.others import get_language_name
 from src.utils.keyboards import get_language_keyboard
 
 router = Router()
@@ -22,7 +23,7 @@ async def choose_language(callback: CallbackQuery):
         user.language = lang
         await user.save()
 
-        return await callback.message.reply("Вы выбрали язык: ") #  LANGUAGES[lang]
+        return await callback.message.reply(f"Вы выбрали язык/Вы выбралі мову: {get_language_name(lang)}")
 
     await Users.create(uid=callback.from_user.id, language=lang)
-    await callback.message.reply("Вы выбрали язык: ") #  LANGUAGES[lang]
+    await callback.message.reply(f"Вы выбрали язык: {get_language_name(lang)}")

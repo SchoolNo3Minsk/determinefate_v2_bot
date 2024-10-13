@@ -7,8 +7,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-from src.database.initialize import setup_db
 from src.routers import get_routers
+from src.database import setup_db
+from src.utils.middlewares import UserLocaleMiddleware
 
 from config import settings
 
@@ -24,6 +25,8 @@ async def main() -> None:
     )
 
     dp.include_routers(*get_routers())
+
+    dp.message.middleware(UserLocaleMiddleware())
 
     await setup_db()
     await dp.start_polling(bot)

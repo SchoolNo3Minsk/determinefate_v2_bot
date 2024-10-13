@@ -18,6 +18,16 @@ class PartizanPerson(BaseModel):
     issue: str | None = Field(default="Не указано.")
 
 
+class PartizanForm(BaseModel):
+    uid: int
+    surname: str
+    name: str
+    middlename: str
+    year_of_birth: int
+    rank: str
+    accepter: str
+
+
 class Partizan(BaseModel):
     id: str
     full_name: str

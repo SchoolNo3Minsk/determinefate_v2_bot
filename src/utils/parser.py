@@ -10,18 +10,18 @@ from selenium.webdriver.chrome.service import Service
 from src.utils.models import Partizan, PartizanPerson, AllPartizans
 
 PARAMS = {
-    'Фамилия': 'surname',
-    'Имя': 'name',
-    'Отчество': 'middlename',
-    'Дата рождения/Возраст': 'date_of_birth',
-    'Место рождения': 'place_of_birth',
-    'Дата и место призыва': 'call_place',
-    'Последнее место службы': 'last_call_place',
-    'Воинское звание': 'rank',
-    'Причина выбытия': 'reason_of_leave',
-    'Дата выбытия': 'date_of_leave',
-    'Место выбытия': 'place_of_leave',
-    'Название источника донесения': 'issue'
+    "Фамилия": "surname",
+    "Имя": "name",
+    "Отчество": "middlename",
+    "Дата рождения/Возраст": "date_of_birth",
+    "Место рождения": "place_of_birth",
+    "Дата и место призыва": "call_place",
+    "Последнее место службы": "last_call_place",
+    "Воинское звание": "rank",
+    "Причина выбытия": "reason_of_leave",
+    "Дата выбытия": "date_of_leave",
+    "Место выбытия": "place_of_leave",
+    "Название источника донесения": "issue"
 }
 
 chrome_options = Options()
@@ -33,7 +33,7 @@ class Parser:
         self.base_url = "https://obd-memorial.ru"
         self.session = aiohttp.ClientSession(base_url=self.base_url)
 
-        self.service = Service(executable_path="C:\\Users\\Violetta\\Documents\\Git\\determinefatebot\\chromedriver.exe")
+        self.service = Service(executable_path="/data/chromedriver/chromedriver.exe")
         self.browser = webdriver.Chrome(options=chrome_options, service=self.service)
 
     @staticmethod
