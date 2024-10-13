@@ -1,26 +1,11 @@
 from aiogram import Router
+from aiogram.types import Message, ReplyKeyboardMarkup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
 
-# from aiogram.dispatcher.filters import Command, Text
-
-# from utils.func import *
-
+from src.utils.state import Add
+from src.utils.keyboards import cancel_keyboard
 from src.utils.others import check_canceled, get_phrase
-
-# def kb2(language):
-#     return [[types.KeyboardButton(text=f'➡️{PHRASES[language]["skip"]}')],
-#             [types.KeyboardButton(text=f'❌{PHRASES[language]["cancel"]}')]]
-#
-#
-# def kb(language):
-#     return [[types.KeyboardButton(text=f'❌{PHRASES[language]["cancel"]}')]]
-#
-#
-# def kb3(language):
-#     return [[types.KeyboardButton(text=f'➡️Да')], [types.KeyboardButton(text=f'❌{PHRASES[language]["cancel"]}')]]
-#
 
 
 router = Router()
@@ -33,10 +18,10 @@ async def find(message: Message, state: FSMContext, locale: str):
         return await message.reply(f"🚥 {get_phrase(locale, "already_state")}")
 
     await state.update_data(uid=message.from_user.id)
-    keyboard = types.ReplyKeyboardMarkup(keyboard=kb(await get_user_language(message.from_id)), resize_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(keyboard=cancel_keyboard(locale), resize_keyboard=True)
 
-    await Form.name.set()
-    await message.reply(f'🧍 {PHRASES[language]["input_name"]}:', reply_markup=keyboard)
+    await state.set_state(Add.name)
+    await message.reply(f'🧍 {get_phrase(locale, "input_name")}:', reply_markup=keyboard)
 
 
 # @dp.message_handler(state=Add.name)
