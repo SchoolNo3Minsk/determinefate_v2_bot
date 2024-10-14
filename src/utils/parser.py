@@ -9,6 +9,9 @@ from selenium.webdriver.chrome.service import Service
 
 from src.utils.models import Partizan, PartizanPerson, AllPartizans
 
+from config import settings
+
+
 PARAMS = {
     "Фамилия": "surname",
     "Имя": "name",
@@ -33,7 +36,7 @@ class Parser:
         self.base_url = "https://obd-memorial.ru"
         self.session = aiohttp.ClientSession(base_url=self.base_url)
 
-        self.service = Service(executable_path="/data/chromedriver/chromedriver.exe")
+        self.service = Service(executable_path=settings.chromedriver_path)
         self.browser = webdriver.Chrome(options=chrome_options, service=self.service)
 
     @staticmethod
