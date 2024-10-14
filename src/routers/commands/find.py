@@ -112,8 +112,8 @@ async def rank(message: Message, state: FSMContext, locale: str):
     # keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
 
     await state.update_data(rank=message.text, accepter="False")
-    async with state.proxy() as data:
 
+    async with state.get_data() as data:
         for key, value in data.items():
             if value == '➡️Пропустить' or value == "➡️Прапусціць":
                 data[key] = ""
