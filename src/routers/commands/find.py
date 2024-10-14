@@ -113,10 +113,10 @@ async def rank(message: Message, state: FSMContext, locale: str):
 
     await state.update_data(rank=message.text, accepter="False")
 
-    async with state.get_data() as data:
-        for key, value in data.items():
-            if value == '➡️Пропустить' or value == "➡️Прапусціць":
-                data[key] = ""
+    data = await state.get_data()
+    for key, value in data.items():
+        if value == '➡️Пропустить' or value == "➡️Прапусціць":
+            data[key] = ""
 
         form = CreatedForm(**data)
 
@@ -125,7 +125,7 @@ async def rank(message: Message, state: FSMContext, locale: str):
     await message.reply(f"""
 <b>{get_phrase(locale, "check_inputed_info")}:</b>
 <b>{get_phrase(locale, "name")}: </b> {form.name}
-<b>{get_phrase(locale, "surnamesurname")}: </b> {form.surname}
+<b>{get_phrase(locale, "surname")}: </b> {form.surname}
 <b>{get_phrase(locale, "middlename")}: </b> {form.middlename}
 <b>{get_phrase(locale, "year_of_birth")}: </b> {form.year_of_birth}
 <b>{get_phrase(locale, "rank")}: </b> {form.rank}
