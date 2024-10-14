@@ -21,7 +21,7 @@ def accept_keyboard(language: str) -> List[List[KeyboardButton]]:
             KeyboardButton(text=f"➡️Да")
         ],
         [
-            KeyboardButton(text=f"❌ {get_phrase(language, 'cancel')}")
+            KeyboardButton(text=f"❌ {get_phrase(language, "cancel")}")
         ]
     ]
 
@@ -30,7 +30,7 @@ def cancel_keyboard(language: str) -> List[List[KeyboardButton]]:
     return [
         [
             KeyboardButton(
-                text=f"❌ {get_phrase(language, 'cancel')}"
+                text=f"❌ {get_phrase(language, "cancel")}"
             )
         ]
     ]
@@ -39,9 +39,9 @@ def cancel_keyboard(language: str) -> List[List[KeyboardButton]]:
 def skip_or_cancel_keyboard(language: str) -> List[List[KeyboardButton]]:
     return [
         [
-            KeyboardButton(text=f"➡️{get_phrase(language, 'skip')}")
+            KeyboardButton(text=f"➡️{get_phrase(language, "skip")}")
         ],
         [
-            KeyboardButton(text=f"❌ {get_phrase(language, 'cancel')}")
+            KeyboardButton(text=f"❌ {get_phrase(language, "cancel")}")
         ]
     ]

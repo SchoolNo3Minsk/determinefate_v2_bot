@@ -9,7 +9,6 @@ async def setup_db() -> None:
         modules={
             "models": [
                 "src.database.models.users"
-                # "src.utils.database.models.queries"
             ]
         },
         timezone='Europe/Minsk',

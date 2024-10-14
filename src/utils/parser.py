@@ -1,3 +1,5 @@
+import asyncio
+
 import aiohttp
 
 from typing import List, Optional
@@ -28,16 +30,15 @@ PARAMS = {
 }
 
 chrome_options = Options()
-chrome_options.add_argument("headless")
+# chrome_options.add_argument("headless")
 
 
 class Parser:
     def __init__(self):
-        self.base_url = "https://obd-memorial.ru"
-        self.session = aiohttp.ClientSession(base_url=self.base_url)
-
         self.service = Service(executable_path=settings.chromedriver_path)
         self.browser = webdriver.Chrome(options=chrome_options, service=self.service)
+
+        self.base_url = "https://obd-memorial.ru"
 
     @staticmethod
     def _get_param_data(soup: BeautifulSoup, title: str) -> str | None:
@@ -54,10 +55,16 @@ class Parser:
             year_of_birth: Optional[int] = None,
             rank: Optional[str] = None,
             page: Optional[int] = 1,
-    ):
-        link = self.base_url + f"/html/search.htm?f={surname}&n={name}&s={middlename}&y={year_of_birth}&r={rank}&p={page}"
+    ) -> AllPartizans | None:
+        link = self.base_url + f"/html/search.htm?f={surname}&n={name}&s={middlename}&y={year_of_birth}&r={rank}"
 
-        self.browser.get(link.replace("None", ""))
+        self.browser.get(
+            link
+            .replace("None", "")
+            .replace("0", "")
+            .replace("➡️Пропустить", "")
+            .replace("➡️Прапусціць", "")
+        )
         self.browser.implicitly_wait(1.5)
 
         div_elements = self.browser.find_elements('tag name', 'div')
@@ -98,9 +105,12 @@ class Parser:
 
         return AllPartizans(Partizan(**data) for data in results) if results else None
 
-    async def get_partizan(self, patrizan_id: int):
-        async with self.session as session:
+    async def get_partizan(self, patrizan_id: int) -> PartizanPerson | None:
+        async with aiohttp.ClientSession(base_url=self.base_url) as session:
             async with session.get(f"/html/info.htm?id={patrizan_id}") as response:
+                if not response.ok:
+                    return None
+
                 text = await response.text()
 
                 soup = BeautifulSoup(text, features='lxml')
