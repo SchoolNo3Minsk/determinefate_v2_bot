@@ -122,10 +122,11 @@ async def rank(message: Message, state: FSMContext, locale: str):
     await state.update_data(rank=message.text, accepter="False")
 
     data = await state.get_data()
+
     for key, value in data.items():
         if value == '➡️Пропустить' or value == "➡️Прапусціць":
             data[key] = ""
-        
+
         form = CreatedForm(**data)
 
     keyboard = ReplyKeyboardMarkup(keyboard=kb3(locale), resize_keyboard=True)
