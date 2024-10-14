@@ -1,7 +1,7 @@
 from aiogram import Router
 from typing import List
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, CallbackQuery
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from pydantic import BaseModel
 
@@ -55,7 +55,7 @@ async def find(message: Message, state: FSMContext, locale: str):
     await message.reply(f'🧍 {get_phrase(locale, "input_name")}:', reply_markup=keyboard)
 
 
-@router.message(state=Add.name)
+@router.message(StateFilter(Add.name))
 @check_canceled
 async def add_surname(message: Message, state: FSMContext, locale: str):
     keyboard = ReplyKeyboardMarkup(keyboard=kb(locale), resize_keyboard=True)
@@ -63,30 +63,30 @@ async def add_surname(message: Message, state: FSMContext, locale: str):
     await message.reply(f'🧍 {get_phrase(locale, "input_surname")}:',
                         reply_markup=keyboard)
     await state.update_data(name=message.text)
-    await Add.surname.set()
+    await state.set_state(Add.surname)
 
 
-@router.message(state=Add.surname)
+@router.message(StateFilter(Add.surname))
 @check_canceled
 async def add_middlename(message: Message, state: FSMContext, locale: str):
     keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
     await message.reply(f'🧑‍🦳 {get_phrase(locale, "input_middlename")}:',
                         reply_markup=keyboard)
     await state.update_data(surname=message.text)
-    await Add.middlename.set()
+    await state.set_state(Add.middlename)
 
 
-@router.message(state=Add.middlename)
+@router.message(StateFilter(Add.middlename))
 @check_canceled
 async def add_date(message: Message, state: FSMContext, locale: str):
     keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
     await message.reply(f'🎂 {get_phrase(locale, "input_year_of_birth")}:',
                         reply_markup=keyboard)
     await state.update_data(middlename=message.text)
-    await Add.year_of_birth.set()
+    await state.set_state(Add.year_of_birth)
 
 
-@router.message(state=Add.year_of_birth)
+@router.message(StateFilter(Add.year_of_birth))
 @check_canceled
 async def add_rank(message: Message, state: FSMContext, locale: str):
     keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
@@ -104,10 +104,10 @@ async def add_rank(message: Message, state: FSMContext, locale: str):
     await message.reply(f'🎖️ {get_phrase(locale, "input_rank")}:', reply_markup=keyboard)
 
     await state.update_data(year_of_birth=int(message.text))
-    await Add.rank.set()
+    await state.set_state(Add.rank)
 
 
-@router.message(state=Add.rank)
+@router.message(StateFilter(Add.rank))
 async def rank(message: Message, state: FSMContext, locale: str):
     # keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
 
@@ -131,7 +131,7 @@ async def rank(message: Message, state: FSMContext, locale: str):
 <b>{get_phrase(locale, "rank")}: </b> {form.rank}
 """, reply_markup=keyboard)
 
-    await Add.accepter.set()
+    await state.set_state(Add.accepter)
 
 
 # @router.message(state=Add.accepter)
