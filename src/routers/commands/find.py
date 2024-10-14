@@ -95,11 +95,11 @@ async def add_rank(message: Message, state: FSMContext, locale: str):
         await message.reply(f'🎖️ {get_phrase(locale, "input_year_of_birth")}:',
                             reply_markup=keyboard)
         await state.update_data(year_of_birth=0)
-        return await Add.rank.set()
+        return await state.set_state(Add.rank)
 
     if not message.text.isdigit():
         await message.reply(f'⛔ {get_phrase(locale, "error_year")}')
-        return await Add.year_of_birth.set()
+        return await state.set_state(Add.year_of_birth)
 
     await message.reply(f'🎖️ {get_phrase(locale, "input_rank")}:', reply_markup=keyboard)
 
