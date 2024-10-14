@@ -161,3 +161,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 /.idea
+.idea/determinefate_v2_bot.iml
+.idea/misc.xml
+.idea/misc.xml
