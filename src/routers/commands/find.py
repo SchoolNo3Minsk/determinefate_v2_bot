@@ -1,7 +1,9 @@
 from aiogram import Router
-from aiogram.types import Message, ReplyKeyboardMarkup
+from typing import List
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, CallbackQuery
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from pydantic import BaseModel
 
 from src.utils.state import Add
 from src.utils.keyboards import cancel_keyboard
@@ -10,12 +12,41 @@ from src.utils.others import check_canceled, get_phrase
 
 router = Router()
 
+def kb(language: str) -> List[List[KeyboardButton]]:
+    return [
+        [KeyboardButton(text=f'❌{get_phrase(language, "cancel")}')]
+    ]
+
+
+def kb2(language: str) -> List[List[KeyboardButton]]:
+    return [
+        [KeyboardButton(text=f'➡️{get_phrase(language, "skip")}')],
+        [KeyboardButton(text=f'❌{get_phrase(language, "cancel")}')]
+    ]
+
+
+def kb3(language: str) -> List[List[KeyboardButton]]:
+    return [
+        [KeyboardButton(text=f'➡️Да')],
+        [KeyboardButton(text=f'❌{get_phrase(language, "cancel")}')]
+    ]
+
+
+class CreatedForm(BaseModel):
+    uid: int
+    surname: str
+    name: str
+    middlename: str
+    year_of_birth: int
+    rank: str
+    accepter: str
+
 
 @router.message(Command("find"))
 @check_canceled
 async def find(message: Message, state: FSMContext, locale: str):
     if await state.get_state():
-        return await message.reply(f"🚥 {get_phrase(locale, "already_state")}")
+        return await message.reply(f"🚥 {get_phrase(locale, 'already_state')}")
 
     await state.update_data(uid=message.from_user.id)
     keyboard = ReplyKeyboardMarkup(keyboard=cancel_keyboard(locale), resize_keyboard=True)
@@ -24,90 +55,90 @@ async def find(message: Message, state: FSMContext, locale: str):
     await message.reply(f'🧍 {get_phrase(locale, "input_name")}:', reply_markup=keyboard)
 
 
-# @dp.message_handler(state=Add.name)
-# @check_canceled
-# async def add_surname(message: types.Message, state: FSMContext):
-#     keyboard = types.ReplyKeyboardMarkup(keyboard=kb(await get_user_language(message.from_id)), resize_keyboard=True)
-#     await message.reply(f'🧍 {PHRASES[await get_user_language(message.from_id)]["input_surname"]}:',
-#                         reply_markup=keyboard)
-#     await state.update_data(name=message.text)
-#     await Add.surname.set()
-#
-#
-# @dp.message_handler(state=Add.surname)
-# @check_canceled
-# async def add_middlename(message: types.Message, state: FSMContext):
-#     keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
-#     await message.reply(f'🧑‍🦳 {PHRASES[await get_user_language(message.from_id)]["input_middlename"]}:',
-#                         reply_markup=keyboard)
-#     await state.update_data(surname=message.text)
-#     await Add.middlename.set()
-#
-#
-# @dp.message_handler(state=Add.middlename)
-# @check_canceled
-# async def add_date(message: types.Message, state: FSMContext):
-#     keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
-#     await message.reply(f'🎂 {PHRASES[await get_user_language(message.from_id)]["input_year_of_birth"]}:',
-#                         reply_markup=keyboard)
-#     await state.update_data(middlename=message.text)
-#     await Add.year_of_birth.set()
-#
-#
-# @dp.message_handler(state=Add.year_of_birth)
-# @check_canceled
-# async def add_rank(message: types.Message, state: FSMContext):
-#     keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
-#
-#     if message.text == "➡️Пропустить" or message.text == "➡️Прапусціць":
-#         await message.reply(f'🎖️ {PHRASES[await get_user_language(message.from_id)]["input_rank"]}:',
-#                             reply_markup=keyboard)
-#         await state.update_data(year_of_birth=0)
-#         return await Add.rank.set()
-#
-#     if not message.text.isdigit():
-#         await message.reply(f'⛔ {PHRASES[await get_user_language(message.from_id)]["error_year"]}')
-#         return await Add.year_of_birth.set()
-#
-#     await message.reply(f'🎖️ {PHRASES[await get_user_language(message.from_id)]["input_rank"]}:', reply_markup=keyboard)
-#
-#     await state.update_data(year_of_birth=int(message.text))
-#     await Add.rank.set()
-#
-#
-# @dp.message_handler(state=Add.rank)
-# async def rank(message: types.Message, state: FSMContext):
-#     # keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
-#
-#     language = await get_user_language(message.from_id)
-#     await state.update_data(rank=message.text, accepter="False")
-#     async with state.proxy() as data:
-#
-#         for key, value in data.items():
-#             if value == '➡️Пропустить' or value == "➡️Прапусціць":
-#                 data[key] = ""
-#
-#         form = CreatedForm(**data)
-#
-#     keyboard = types.ReplyKeyboardMarkup(keyboard=kb3(await get_user_language(message.from_id)), resize_keyboard=True)
-#
-#     await message.reply(f"""
-# <b>{PHRASES[language]["check_inputed_info"]}:</b>
-# <b>{PHRASES[language]["name"]}: </b> {form.name}
-# <b>{PHRASES[language]["surname"]}: </b> {form.surname}
-# <b>{PHRASES[language]["middlename"]}: </b> {form.middlename}
-# <b>{PHRASES[language]["year_of_birth"]}: </b> {form.year_of_birth}
-# <b>{PHRASES[language]["rank"]}: </b> {form.rank}
-# """, reply_markup=keyboard)
-#
-#     await Add.accepter.set()
-#
-#
-# @dp.message_handler(state=Add.accepter)
-# async def rank(message: types.Message, state: FSMContext):
+@router.message(state=Add.name)
+@check_canceled
+async def add_surname(message: Message, state: FSMContext, locale: str):
+    keyboard = ReplyKeyboardMarkup(keyboard=kb(locale), resize_keyboard=True)
+
+    await message.reply(f'🧍 {get_phrase(locale, "input_surname")}:',
+                        reply_markup=keyboard)
+    await state.update_data(name=message.text)
+    await Add.surname.set()
+
+
+@router.message(state=Add.surname)
+@check_canceled
+async def add_middlename(message: Message, state: FSMContext, locale: str):
+    keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
+    await message.reply(f'🧑‍🦳 {get_phrase(locale, "input_middlename")}:',
+                        reply_markup=keyboard)
+    await state.update_data(surname=message.text)
+    await Add.middlename.set()
+
+
+@router.message(state=Add.middlename)
+@check_canceled
+async def add_date(message: Message, state: FSMContext, locale: str):
+    keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
+    await message.reply(f'🎂 {get_phrase(locale, "input_year_of_birth")}:',
+                        reply_markup=keyboard)
+    await state.update_data(middlename=message.text)
+    await Add.year_of_birth.set()
+
+
+@router.message(state=Add.year_of_birth)
+@check_canceled
+async def add_rank(message: Message, state: FSMContext, locale: str):
+    keyboard = ReplyKeyboardMarkup(keyboard=kb2(locale), resize_keyboard=True)
+
+    if message.text == "➡️Пропустить" or message.text == "➡️Прапусціць":
+        await message.reply(f'🎖️ {get_phrase(locale, "input_year_of_birth")}:',
+                            reply_markup=keyboard)
+        await state.update_data(year_of_birth=0)
+        return await Add.rank.set()
+
+    if not message.text.isdigit():
+        await message.reply(f'⛔ {get_phrase(locale, "error_year")}')
+        return await Add.year_of_birth.set()
+
+    await message.reply(f'🎖️ {get_phrase(locale, "input_rank")}:', reply_markup=keyboard)
+
+    await state.update_data(year_of_birth=int(message.text))
+    await Add.rank.set()
+
+
+@router.message(state=Add.rank)
+async def rank(message: Message, state: FSMContext, locale: str):
+    # keyboard = types.ReplyKeyboardMarkup(keyboard=kb2(await get_user_language(message.from_id)), resize_keyboard=True)
+
+    await state.update_data(rank=message.text, accepter="False")
+    async with state.proxy() as data:
+
+        for key, value in data.items():
+            if value == '➡️Пропустить' or value == "➡️Прапусціць":
+                data[key] = ""
+
+        form = CreatedForm(**data)
+
+    keyboard = ReplyKeyboardMarkup(keyboard=kb3(locale), resize_keyboard=True)
+
+    await message.reply(f"""
+<b>{get_phrase(locale, "check_inputed_info")}:</b>
+<b>{get_phrase(locale, "name")}: </b> {form.name}
+<b>{get_phrase(locale, "surnamesurname")}: </b> {form.surname}
+<b>{get_phrase(locale, "middlename")}: </b> {form.middlename}
+<b>{get_phrase(locale, "year_of_birth")}: </b> {form.year_of_birth}
+<b>{get_phrase(locale, "rank")}: </b> {form.rank}
+""", reply_markup=keyboard)
+
+    await Add.accepter.set()
+
+
+# @router.message(state=Add.accepter)
+# async def rank(message: Message, state: FSMContext, locale: str):
 #     accepter = message.text
 #
-#     if accepter == f"❌{PHRASES[await get_user_language(message.from_id)]['cancel']}":
+#     if accepter == f"❌ {get_phrase(locale, 'cancel')}":
 #         return
 #
 #     if accepter == "➡️Да":
@@ -136,10 +167,10 @@ async def find(message: Message, state: FSMContext, locale: str):
 #         text += f"\nСсылка на результат: https://t.me/determinefateBot?start=search_{query.id}"
 #
 #         await message.reply(text, reply_markup=buttons)
-#
-#
-# @dp.callback_query_handler(lambda c: c.data.startswith('find:'))
-# async def process_callback_button(callback_query: types.CallbackQuery):
+
+
+# @router.callback_query(lambda c: c.data.startswith('find:'))
+# async def process_callback_button(callback_query: CallbackQuery, locale: str):
 #     id = callback_query.data.split(':')[1]
 #
 #     partizan = await get_partizan_by_id(id)

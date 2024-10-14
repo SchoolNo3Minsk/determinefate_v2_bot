@@ -34,7 +34,7 @@ def check_canceled(function):
             await state.clear()
 
             return await message.reply(
-                text=f"⛔ {get_phrase(locale, "error_cancel")}",
+                text=f"⛔ {get_phrase(locale, 'error_cancel')}",
                 reply_markup=ReplyKeyboardRemove()
             )
 
